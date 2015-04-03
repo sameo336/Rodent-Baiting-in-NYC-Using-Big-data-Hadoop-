@@ -1,0 +1,7 @@
+/*These set of PIG commands were used for getting the number of rodent complaints received each year. NOTE: Same code was run for each year's (2010 - 2014) rodent complaint database*/
+
+
+table = LOAD '/user/cloudera/Hey.txt' USING PigStorage('/t') AS (key : int, date : chararray);
+table2 = GROUP table1 by key;
+table3 = FOREACH table2 GENERATE group, COUNT(table.key);
+Store table3 into 'Output.txt';

@@ -1,0 +1,22 @@
+
+/*These set of PIG commands are used for creating a single uniform database from 2 databases. This database will then be the input for MapReduce2*/
+
+--Creating rodent complaints database	
+rodent5 = LOAD '/home/cloudera/Desktop/Rodent_date_FINAL/rodent_date' USING PigStorage(',') AS (rodent_date:chararray)
+
+
+--Creating weather database
+
+weather5 = LOAD '/home/cloudera/Desktop/Rodent_date_FINAL/WeatherRange.csv' USING PigStorage(',') AS (weather_date:chararray, temp:float,temp_range:chararray)
+
+/*Creating a single database by using INNER JOIN on the rodent complaint database. (That is, we are extracting the temperature for the date on which each rodent complaint was made.) */
+
+Y = JOIN rodent5 BY rodent_date, weather5 BY weather_date;
+
+--Removing extra columns created by the INNER JOIN statement
+
+Q = FOREACH Y GENERATE $0, $3;    
+
+--Storing the output so that it can be used in MapReduce
+
+STORE Q INTO '/home/cloudera/Desktop/temperature_final3'; 

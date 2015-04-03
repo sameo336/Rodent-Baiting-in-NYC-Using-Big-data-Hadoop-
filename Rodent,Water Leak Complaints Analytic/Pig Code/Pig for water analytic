@@ -1,0 +1,20 @@
+/These set of PIG commands are used for creating a single uniform database from 2 databases. This database will then be the input for MapReduce1*/
+
+
+--Creating rodent complaints database
+
+rodent = LOAD 'home/cloudera/Desktop/MR1/first_row/311_Rodent_final_1.csv' USING PigStorage(',') AS (Incident_Zip1:int, Created_Date1:chararray)
+
+--Creating water system complaints database
+
+water = LOAD 'home/cloudera/Desktop/MR1/first_row/311_Water_final.csv' USING PigStorage(',') AS (Incident_Zip:int, Created_Date:chararray)
+
+--Using 'cogroup' to join the 2 databases based on water system complaint date
+
+E = COGROUP water by Incident_Zip INNER, rodent by Incident_Zip1
+
+T = foreach E generate flatten(water), rodent.Created_Date1
+
+--Storing the file, which will be the input to MapReduce
+
+STORE T INTO '/home/cloudera/Desktop/output_water';
